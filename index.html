@@ -3,209 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ôn tập Lịch sử 7</title>
+    <title>Ôn Tập Lịch Sử Nhà Trần - Nhà Hồ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
         }
         .option-btn {
-            transition: all 0.2s ease-in-out;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .option-btn:not(:disabled):hover {
+            transform: translateY(-1px);
+            border-color: #6366f1;
+            background-color: #f5f3ff;
+        }
+        .option-btn:disabled {
+            cursor: default;
+        }
+        .correct {
+            background-color: #ecfdf5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            box-shadow: 0 0 0 1px #10b981;
+        }
+        .wrong {
+            background-color: #fef2f2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+            box-shadow: 0 0 0 1px #ef4444;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="text-slate-800 pb-12">
+<body class="antialiased">
 
-    <header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-book-open"></i>
-                Ôn tập Lịch sử 7
-            </h1>
-            <div id="score-display" class="hidden font-semibold text-lg bg-indigo-800 px-4 py-1 rounded-full border border-indigo-400">
-                0 / 16
+    <div id="app" class="min-h-screen flex flex-col items-center py-8 px-4">
+        <!-- Progress Bar Top -->
+        <div class="w-full max-w-2xl mb-8">
+            <div class="flex justify-between items-end mb-2">
+                <h1 class="text-indigo-700 font-extrabold text-xl">NHÀ TRẦN - NHÀ HỒ</h1>
+                <span id="progress-text" class="text-sm font-bold text-slate-500 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100">Câu 1 / 16</span>
             </div>
-        </div>
-    </header>
-
-    <main class="max-w-4xl mx-auto px-4 mt-8">
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-200 border-l-4 border-l-indigo-500">
-            <h2 class="text-lg font-semibold text-slate-800 mb-2">Chuyên đề: Thời Trần & Thời Hồ</h2>
-            <p class="text-slate-600 text-sm md:text-base">Hệ thống trắc nghiệm giúp học sinh ôn tập kiến thức Lịch sử lớp 7 hiệu quả.</p>
-        </div>
-
-        <!-- Menu Chức năng -->
-        <div id="mode-selection" class="bg-white rounded-xl shadow-sm p-8 mb-8 border border-slate-200 text-center">
-            <h2 class="text-2xl font-bold text-slate-800 mb-6">Chọn chế độ làm bài</h2>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button onclick="startQuiz(false)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all flex justify-center items-center gap-2 text-lg">
-                    <i class="fa-solid fa-file-lines"></i> Đề gốc
-                </button>
-                <button onclick="startQuiz(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all flex justify-center items-center gap-2 text-lg">
-                    <i class="fa-solid fa-shuffle"></i> Trộn đề
-                </button>
+            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden shadow-inner">
+                <div id="progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-500"></div>
             </div>
         </div>
 
-        <div id="quiz-area" class="hidden">
-            <div id="quiz-container" class="space-y-6"></div>
-            <div class="mt-8 flex flex-col items-center gap-4">
-                <div class="flex gap-4">
-                    <button id="submit-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all flex items-center gap-2 text-lg">
-                        <i class="fa-solid fa-check-to-slot"></i> Nộp bài
-                    </button>
-                    <button id="retry-btn" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-lg shadow-sm transition-all flex items-center gap-2 text-lg">
-                        <i class="fa-solid fa-rotate-right"></i> Làm bài khác
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="w-full max-w-2xl bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 sm:p-10 fade-in">
+            <div id="question-box">
+                <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-slate-800 leading-tight mb-8">Đang tải câu hỏi...</h2>
+                
+                <div id="options-list" class="space-y-4">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+
+            <!-- Feedback & Next Button -->
+            <div id="action-area" class="mt-8 pt-8 border-t border-slate-100 hidden">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div id="feedback-msg" class="flex items-center gap-2 font-bold text-lg">
+                        <!-- Correct/Wrong text -->
+                    </div>
+                    <button id="next-btn" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-2xl shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        Tiếp theo
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
                     </button>
                 </div>
             </div>
         </div>
-    </main>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10 text-center border border-slate-100 hidden fade-in">
+            <div class="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-extrabold text-slate-800 mb-2">Hoàn Thành!</h2>
+            <p id="result-comment" class="text-slate-500 mb-8 px-4">Bạn đã nỗ lực hết mình!</p>
+            
+            <div class="bg-indigo-50 rounded-2xl p-6 mb-8 border border-indigo-100">
+                <div class="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-1">Kết quả</div>
+                <div id="final-score" class="text-6xl font-black text-indigo-600">0/16</div>
+                <div id="final-percent" class="mt-2 font-bold text-emerald-600">Chính xác 0%</div>
+            </div>
+
+            <button id="restart-btn" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Luyện tập lại
+            </button>
+        </div>
+    </div>
 
     <script>
-        const originalData = [
-            { question: "Câu 1. Kế sách nào đã được nhà Trần sử dụng trong cả 3 lần kháng chiến chống quân xâm lược Mông – Nguyên?", options: ["A. Tiên phát chế nhân.", "B. Vườn không nhà trống.", "C. Đóng cọc trên sông Bạch Đằng.", "D. Tổng tấn công."], correct: 1 },
-            { question: "Câu 2. Để khích lệ tinh thần chiến đấu của quân sĩ, Hưng Đạo Vương Trần Quốc Tuấn đã viết ra tác phẩm nào?", options: ["A. Nam quốc sơn hà.", "B. Hịch tướng sĩ.", "C. Bình Ngô đại cáo.", "D. Tụ nghĩa binh văn."], correct: 1 },
-            { question: "Câu 3. Nội dung nào không phản ánh đúng ý nghĩa lịch sử của ba lần kháng chiến chống Mông-Nguyên?", options: ["A. Bảo vệ độc lập dân tộc.", "B. Ngăn chặn âm mưu xâm lược của nhà Nguyên.", "C. Buộc nhà Nguyên phải kiêng nể, thần phục.", "D. Làm phong phú nghệ thuật quân sự."], correct: 2 },
-            { question: "Câu 4. Trước sự khủng hoảng của nhà Trần cuối thế kỉ XIV, Hồ Quý Ly đã làm gì?", options: ["A. Phò tá vua Trần.", "B. Rút lui về quê.", "C. Phế truất vua Trần, lập triều đại mới.", "D. Mời quân Minh sang giúp."], correct: 2 },
-            { question: "Câu 5. Nội dung nào không phải là cải cách chính trị của Hồ Quý Ly?", options: ["A. Đổi tên đơn vị hành chính.", "B. Đặt chức Hà đê sứ ở các lộ.", "C. Quy định lại bộ máy quan lại.", "D. Tăng cường quyền trung ương."], correct: 1 },
-            { question: "Câu 6. Hồ Quý Ly ban hành chính sách hạn điền và hạn nô nhằm?", options: ["A. Thúc đẩy thương nghiệp.", "B. Khuyến khích khai hoang.", "C. Hạn chế thế lực quý tộc Trần.", "D. Xóa bỏ chế độ chiếm hữu nô lệ."], correct: 2 },
-            { question: "Câu 7. Tiền giấy đầu tiên của Hồ Quý Ly tên là?", options: ["A. Thông bảo hội sao.", "B. Thái bình hưng bảo.", "C. Thiên cảm nguyên bảo.", "D. Minh đạo thông bảo."], correct: 0 },
-            { question: "Câu 8. Quốc hiệu nước ta dưới thời nhà Hồ là?", options: ["A. Đại Việt.", "B. Đại Cồ Việt.", "C. Đại Ngu.", "D. Việt Nam."], correct: 2 },
-            { question: "Câu 9. Năm 1257, trước sứ giả Mông Cổ, vua Trần Thái Tông đã?", options: ["A. Chấp nhận yêu cầu dụ hàng.", "B. Cho bắt giam sứ giả, chuẩn bị kháng chiến.", "C. Sang thương thuyết cầu hòa.", "D. Bỏ kinh thành rút chạy."], correct: 1 },
-            { question: "Câu 10. Trước tình hình quân Nguyên ráo riết xâm lược năm 1279, nhà Trần đã?", options: ["A. Triệu tập hội nghị Bình Than và Diên Hồng.", "B. Sai sứ sang dâng nộp bản đồ.", "C. Yêu cầu quân đội đầu hàng.", "D. Xây dựng thành lũy ở Thăng Long."], correct: 0 },
-            { question: "Câu 11. Điểm chung của chiến thắng 938, 981 và 1288 là gì?", options: ["A. Thực hiện Vườn không nhà trống.", "B. Đánh giặc tại biên giới.", "C. Chiến thắng lớn trên sông Bạch Đằng.", "D. Kết thúc bằng hòa ước."], correct: 2 },
-            { question: "Câu 12. Nguyên nhân nào không phản ánh đúng thắng lợi chống Mông – Nguyên?", options: ["A. Sự lãnh đạo tài tình.", "B. Đoàn kết toàn dân.", "C. Nghệ thuật quân sự độc đáo.", "D. Quân Nguyên ít và yếu."], correct: 3 },
-            { question: "Câu 13. Bối cảnh nào không đúng khi nhà Hồ thành lập?", options: ["A. Nhà Trần suy yếu.", "B. Khởi nghĩa nông dân bùng nổ.", "C. Giặc Chiêm Thành xâm lấn.", "D. Đất nước thái bình thịnh trị."], correct: 3 },
-            { question: "Câu 14. Nhà Hồ dời kinh đô về đâu?", options: ["A. Hoa Lư.", "B. Tây Đô (Thanh Hóa).", "C. Phú Xuân.", "D. Cổ Loa."], correct: 1 },
-            { question: "Câu 15. Cuộc kháng chiến chống Minh của nhà Hồ kết thúc như thế nào?", options: ["A. Thắng lợi vang dội.", "B. Kéo dài hàng chục năm.", "C. Thất bại, nhà Hồ sụp đổ.", "D. Ký kết biên giới hòa bình."], correct: 2 },
-            { question: "Câu 16. Di sản thế giới được UNESCO công nhận năm 2011 là?", options: ["A. Hoàng thành Thăng Long.", "B. Thành nhà Hồ.", "C. Cố đô Huế.", "D. Thánh địa Mỹ Sơn."], correct: 1 }
+        const quizData = [
+            {
+                question: "Kế sách nào đã được nhà Trần sử dụng trong cả 3 lần kháng chiến chống quân xâm lược Mông – Nguyên?",
+                options: ["Tiên phát chế nhân (Đánh trước để khống chế kẻ thù).", "Vườn không nhà trống.", "Đóng cọc trên sông Bạch Đằng.", "Tổng tấn công vào sào huyệt của giặc."],
+                correct: 1
+            },
+            {
+                question: "Để khích lệ tinh thần chiến đấu của quân sĩ, Hưng Đạo Vương Trần Quốc Tuấn đã viết ra tác phẩm nào?",
+                options: ["Nam quốc sơn hà.", "Hịch tướng sĩ.", "Bình Ngô đại cáo.", "Tụ nghĩa binh văn."],
+                correct: 1
+            },
+            {
+                question: "Nội dung nào dưới đây không phản ánh đúng ý nghĩa lịch sử của ba lần kháng chiến chống quân xâm lược Mông-Nguyên?",
+                options: ["Bảo vệ độc lập, chủ quyền và toàn vẹn lãnh thổ.", "Ngăn chặn âm mưu xâm lược của nhà Nguyên đối với các nước khác.", "Buộc nhà Nguyên phải kiêng nể, thần phục đối với Đại Việt.", "Góp phần làm phong phú thêm nghệ thuật quân sự Việt Nam."],
+                correct: 2
+            },
+            {
+                question: "Trước sự khủng hoảng suy yếu của nhà Trần cuối thế kỉ XIV, Hồ Quý Ly đã có hành động gì?",
+                options: ["Phò tá vua Trần cải cách đất nước.", "Rút lui về quê ở ẩn để phản đối triều đình.", "Phế truất vua Trần, lên ngôi vua, lập ra triều đại mới.", "Mời quân Minh sang giúp đỡ dẹp loạn."],
+                correct: 2
+            },
+            {
+                question: "Nội dung nào sau đây không phải là cải cách trên lĩnh vực chính trị - hành chính của Hồ Quý Ly?",
+                options: ["Đổi tên một số đơn vị hành chính cấp lộ, phủ.", "Đặt chức Hà đê sứ ở các lộ để quản mọi việc trong phủ, châu.", "Quy định lại bộ máy quan lại ở địa phương.", "Tăng cường quyền lực của trung ương tập quyền."],
+                correct: 1
+            },
+            {
+                question: "Hồ Quý Ly ban hành chính sách hạn điền và hạn nô nhằm mục đích gì?",
+                options: ["Thúc đẩy thương nghiệp phát triển.", "Khuyến khích người dân khai hoang mở rộng diện tích.", "Hạn chế thế lực của quý tộc Trần.", "Xóa bỏ hoàn toàn chế độ chiếm hữu nô lệ."],
+                correct: 2
+            },
+            {
+                question: "Hồ Quý Ly cho phát hành loại tiền giấy đầu tiên là:",
+                options: ["Thông bảo hội sao.", "Thái bình hưng bảo.", "Thiên cảm nguyên bảo.", "Minh đạo thông bảo."],
+                correct: 0
+            },
+            {
+                question: "Quốc hiệu nước ta dưới thời nhà Hồ là",
+                options: ["Đại Việt.", "Đại Cồ Việt.", "Đại Ngu.", "Việt Nam."],
+                correct: 2
+            },
+            {
+                question: "Năm 1257, khi Mông Cổ cho quân áp sát biên giới Đại Việt và cử sứ giả đến Thăng Long dụ hàng, vua Trần Thái Tông đã có thái độ như thế nào?",
+                options: ["Chấp nhận yêu cầu của sứ giả để giữ hòa bình.", "Cho bắt giam sứ giả, đồng thời chuẩn bị sẵn sàng kháng chiến.", "Cử đại diện sang thương thuyết xin cầu hòa.", "Bỏ kinh thành Thăng Long rút chạy về phía Nam."],
+                correct: 1
+            },
+            {
+                question: "Năm 1279, nhà Nguyên đã chiếm được toàn bộ lãnh thổ Trung Quốc và ráo riết chuẩn bị lực lượng để xâm lược Đại Việt. Trước tình hình đó, nhà Trần đã",
+                options: ["triệu tập hội nghị Bình Than và Diên Hồng để bàn kế sách đánh giặc.", "lập tức sai sứ giả sang dâng nộp bản đồ lãnh thổ.", "yêu cầu quân đội đầu hàng để tránh tổn thất cho nhân dân.", "xây dựng hệ thống thành lũy kiên cố tại Thăng Long."],
+                correct: 0
+            },
+            {
+                question: "Cuộc kháng chiến chống quân Nam Hán của Ngô Quyền (938), chống quân Tống thời Tiền Lê (981) và chống quân Nguyên thời Trần (1287 – 1288) có điểm chung nào?",
+                options: ["Đều thực hiện kế sách \"Vườn không nhà trống\".", "Đều đánh bại giặc ngay trên biên giới phía Bắc.", "Bố trí trận địa mai phục và giành được chiến thắng lớn trên sông Bạch Đằng.", "Đều kết thúc bằng việc ký kết hòa ước hữu nghị."],
+                correct: 2
+            },
+            {
+                question: "Nội dung nào dưới đây không phản ánh đúng nguyên nhân thắng lợi trong ba lần kháng chiến chống Mông – Nguyên (thế kỉ XIII)?",
+                options: ["Sự lãnh đạo tài tình của các vua Trần và tướng lĩnh.", "Tinh thần đoàn kết, quyết chiến của toàn thể nhân dân.", "Nghệ thuật quân sự độc đáo, sáng tạo.", "Quân Mông – Nguyên số lượng ít, khí thế chiến đấu kém cỏi."],
+                correct: 3
+            },
+            {
+                question: "Nội dung nào dưới đây không phản ánh đúng bối cảnh dẫn đến sự thành lập của nhà Hồ?",
+                options: ["Triều đình nhà Trần suy yếu, vua ăn chơi sa đọa.", "Các cuộc khởi nghĩa nông dân bùng nổ khắp nơi.", "Giặc Chiêm Thành thường xuyên xâm lấn biên giới phía Nam.", "Kinh tế phát triển, đất nước thái bình, thịnh trị."],
+                correct: 3
+            },
+            {
+                question: "Nhà Hồ đã dời kinh đô từ Thăng Long (Hà Nội) về",
+                options: ["Hoa Lư (Ninh Bình).", "Tây Đô (Thanh Hóa).", "Phú Xuân (Huế).", "Cổ Loa (Đông Anh)."],
+                correct: 1
+            },
+            {
+                question: "Cuộc kháng chiến chống quân xâm lược Minh của nhà Hồ đã",
+                options: ["giành thắng lợi vang dội, bảo vệ được độc lập dân tộc.", "kéo dài hàng chục năm khiến quân Minh phải rút về nước.", "thất bại, nhà Hồ sụp đổ, giặc Minh đặt ách cai trị ở nước ta.", "kết thúc bằng việc hai bên ký kết biên giới hòa bình."],
+                correct: 2
+            },
+            {
+                question: "Công trình kiến trúc nào thời nhà Hồ đã được UNESCO công nhận là Di sản thế giới vào năm 2011?",
+                options: ["Hoàng thành Thăng Long.", "Thành nhà Hồ.", "Cố đô Huế.", "Thánh địa Mỹ Sơn."],
+                correct: 1
+            }
         ];
 
-        let currentData = [];
-        let userAnswers = [];
-        let isSubmitted = false;
+        let currentIdx = 0;
+        let score = 0;
+        let selectedIdx = null;
 
-        function startQuiz(shuffled) {
-            document.getElementById('mode-selection').classList.add('hidden');
-            document.getElementById('quiz-area').classList.remove('hidden');
+        const questionText = document.getElementById('question-text');
+        const optionsList = document.getElementById('options-list');
+        const actionArea = document.getElementById('action-area');
+        const feedbackMsg = document.getElementById('feedback-msg');
+        const nextBtn = document.getElementById('next-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        const quizContainer = document.getElementById('quiz-container');
+        const resultScreen = document.getElementById('result-screen');
+        const finalScoreText = document.getElementById('final-score');
+        const finalPercentText = document.getElementById('final-percent');
+        const resultComment = document.getElementById('result-comment');
+        const restartBtn = document.getElementById('restart-btn');
+
+        function initQuiz() {
+            currentIdx = 0;
+            score = 0;
+            selectedIdx = null;
+            quizContainer.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = quizData[currentIdx];
+            selectedIdx = null;
             
-            if (shuffled) {
-                currentData = originalData.map(q => {
-                    let opts = q.options.map((o, i) => ({ text: o, originalIndex: i }));
-                    opts.sort(() => Math.random() - 0.5);
-                    return {
-                        question: q.question.replace(/^Câu \d+\.\s*/, ''),
-                        options: opts.map(o => o.text),
-                        correct: opts.findIndex(o => o.originalIndex === q.correct)
-                    };
-                }).sort(() => Math.random() - 0.5);
-                currentData = currentData.map((q, i) => ({ ...q, question: `Câu ${i+1}. ${q.question}` }));
-            } else {
-                currentData = JSON.parse(JSON.stringify(originalData));
-            }
-
-            userAnswers = new Array(currentData.length).fill(null);
-            isSubmitted = false;
-            renderQuiz();
-        }
-
-        function renderQuiz() {
-            const container = document.getElementById('quiz-container');
-            container.innerHTML = '';
-            currentData.forEach((q, qIdx) => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-xl shadow-sm p-6 border border-slate-200';
-                card.id = `q-block-${qIdx}`;
-                card.innerHTML = `<h3 class="text-lg font-semibold mb-4">${q.question}</h3><div id="opts-${qIdx}" class="space-y-3"></div>`;
-                container.appendChild(card);
-
-                const optsDiv = card.querySelector(`#opts-${qIdx}`);
-                q.options.forEach((opt, oIdx) => {
-                    const btn = document.createElement('div');
-                    btn.id = `q${qIdx}-o${oIdx}`;
-                    btn.className = 'option-btn border border-slate-200 rounded-lg p-3 cursor-pointer hover:bg-slate-50 flex items-start gap-3';
-                    btn.onclick = () => selectOption(qIdx, oIdx);
-                    btn.innerHTML = `<div id="icon-${qIdx}-${oIdx}" class="mt-0.5 text-slate-400 min-w-[20px]"><i class="fa-regular fa-circle"></i></div><div class="text-slate-700">${opt}</div>`;
-                    optsDiv.appendChild(btn);
-                });
-            });
-        }
-
-        function selectOption(qIdx, oIdx) {
-            if (isSubmitted) return;
-            userAnswers[qIdx] = oIdx;
-            const container = document.getElementById(`opts-${qIdx}`);
-            container.querySelectorAll('.option-btn').forEach(btn => {
-                btn.className = 'option-btn border border-slate-200 rounded-lg p-3 cursor-pointer hover:bg-slate-50 flex items-start gap-3 bg-white';
-                btn.querySelector('div:first-child').innerHTML = '<i class="fa-regular fa-circle"></i>';
-                btn.querySelector('div:first-child').className = 'mt-0.5 text-slate-400 min-w-[20px]';
-            });
-            const sel = document.getElementById(`q${qIdx}-o${oIdx}`);
-            sel.className = 'option-btn border border-indigo-500 bg-indigo-50 rounded-lg p-3 cursor-pointer flex items-start gap-3 shadow-sm';
-            const icon = document.getElementById(`icon-${qIdx}-${oIdx}`);
-            icon.innerHTML = '<i class="fa-solid fa-circle-dot text-indigo-600"></i>';
-        }
-
-        document.getElementById('submit-btn').onclick = function() {
-            const unanswered = userAnswers.filter(a => a === null).length;
-            if (unanswered > 0) {
-                if (!confirm(`Bạn còn ${unanswered} câu chưa làm. Vẫn nộp bài chứ?`)) return;
-            }
-
-            isSubmitted = true;
-            this.classList.add('hidden');
-            document.getElementById('retry-btn').classList.remove('hidden');
+            // UI updates
+            questionText.innerText = q.question;
+            progressText.innerText = `Câu ${currentIdx + 1} / ${quizData.length}`;
+            progressBar.style.width = `${(currentIdx / quizData.length) * 100}%`;
             
-            let score = 0;
-            currentData.forEach((q, qIdx) => {
-                const uAns = userAnswers[qIdx];
-                const cAns = q.correct;
-                const block = document.getElementById(`q-block-${qIdx}`);
+            actionArea.classList.add('hidden');
+            optionsList.innerHTML = '';
+            
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-5 rounded-2xl border-2 border-slate-100 flex items-center gap-4 text-slate-700 font-medium group';
+                btn.innerHTML = `
+                    <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors font-bold text-sm">
+                        ${String.fromCharCode(65 + i)}
+                    </span>
+                    <span class="leading-relaxed">${opt}</span>
+                `;
+                btn.onclick = () => selectOption(i);
+                optionsList.appendChild(btn);
+            });
 
-                if (uAns === null) {
-                    const msg = document.createElement('div');
-                    msg.className = 'text-red-500 text-sm font-medium mb-2';
-                    msg.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Bạn chưa chọn câu này';
-                    block.insertBefore(msg, block.querySelector('div'));
+            // Smooth entrance
+            quizContainer.classList.remove('fade-in');
+            void quizContainer.offsetWidth; // trigger reflow
+            quizContainer.classList.add('fade-in');
+        }
+
+        function selectOption(idx) {
+            if (selectedIdx !== null) return;
+            
+            selectedIdx = idx;
+            const q = quizData[currentIdx];
+            const isCorrect = idx === q.correct;
+            if (isCorrect) score++;
+
+            const btns = optionsList.querySelectorAll('button');
+            btns.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                    btn.querySelector('span:first-child').classList.replace('bg-slate-100', 'bg-emerald-200');
+                } else if (i === idx && !isCorrect) {
+                    btn.classList.add('wrong');
+                    btn.querySelector('span:first-child').classList.replace('bg-slate-100', 'bg-red-200');
+                } else {
+                    btn.style.opacity = "0.5";
                 }
-
-                q.options.forEach((_, oIdx) => {
-                    const el = document.getElementById(`q${qIdx}-o${oIdx}`);
-                    const icon = document.getElementById(`icon-${qIdx}-${oIdx}`);
-                    el.classList.remove('cursor-pointer', 'hover:bg-slate-50');
-                    
-                    if (oIdx === cAns) {
-                        el.className = 'option-btn border-2 border-green-500 bg-green-50 rounded-lg p-3 flex items-start gap-3';
-                        icon.innerHTML = '<i class="fa-solid fa-circle-check text-green-600 text-lg"></i>';
-                        if (uAns === cAns) score++;
-                    } else if (oIdx === uAns) {
-                        el.className = 'option-btn border border-red-400 bg-red-50 rounded-lg p-3 flex items-start gap-3 opacity-80';
-                        icon.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500 text-lg"></i>';
-                    }
-                });
             });
 
-            document.getElementById('score-display').innerText = `Điểm: ${score} / ${currentData.length}`;
-            document.getElementById('score-display').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Show feedback area
+            feedbackMsg.innerHTML = isCorrect 
+                ? '<span class="text-emerald-600 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg> Chính xác!</span>'
+                : `<span class="text-red-500 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg> Sai rồi. Đáp án là ${String.fromCharCode(65 + q.correct)}</span>`;
+            
+            nextBtn.innerText = currentIdx === quizData.length - 1 ? "Xem kết quả" : "Tiếp theo";
+            actionArea.classList.remove('hidden');
+        }
+
+        nextBtn.onclick = () => {
+            if (currentIdx < quizData.length - 1) {
+                currentIdx++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
         };
 
-        document.getElementById('retry-btn').onclick = () => {
-            document.getElementById('mode-selection').classList.remove('hidden');
-            document.getElementById('quiz-area').classList.add('hidden');
-            document.getElementById('score-display').classList.add('hidden');
-            document.getElementById('submit-btn').classList.remove('hidden');
-            document.getElementById('retry-btn').classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            progressBar.style.width = '100%';
+            
+            const percent = Math.round((score / quizData.length) * 100);
+            finalScoreText.innerText = `${score}/${quizData.length}`;
+            finalPercentText.innerText = `Chính xác ${percent}%`;
+            
+            if (percent === 100) resultComment.innerText = "Tuyệt vời! Bạn đã là bậc thầy lịch sử.";
+            else if (percent >= 80) resultComment.innerText = "Rất tốt! Kiến thức của bạn rất chắc chắn.";
+            else if (percent >= 50) resultComment.innerText = "Khá tốt! Hãy ôn luyện thêm để đạt điểm cao hơn.";
+            else resultComment.innerText = "Bạn cần xem lại kiến thức một chút nhé. Cố gắng lên!";
+        }
+
+        restartBtn.onclick = initQuiz;
+
+        // Start on load
+        window.onload = initQuiz;
     </script>
 </body>
 </html>
